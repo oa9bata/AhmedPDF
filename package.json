@@ -22,12 +22,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/ahmedpdf.git"
+    "url": "https://github.com/oa9bata/ahmedPDF.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/ahmedpdf/issues"
+    "url": "https://github.com/oa9bata/ahmedPDF/issues"
   },
-  "homepage": "https://github.com/yourusername/ahmedpdf#readme",
+  "homepage": "https://github.com/oa9bata/ahmedPDF#readme",
   "dependencies": {
     "dotenv": "^17.2.1"
   },
