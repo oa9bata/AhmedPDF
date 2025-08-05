@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AhmedPDF Analytics Dashboard</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        .font-inter { font-family: 'Inter', sans-serif; }
+        .stat-card { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: transform 0.3s ease;
+        }
+        .stat-card:hover { transform: translateY(-5px); }
+        .stat-card.purple { background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%); }
+        .stat-card.green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .stat-card.blue { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); }
+        .stat-card.orange { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+        
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-inter">
+    <div class="min-h-screen">
+        <!-- Navigation -->
+        <nav class="bg-white shadow-sm border-b">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center py-4">
+                    <div class="flex items-center">
+                        <a href="index.html" class="text-xl sm:text-2xl font-bold text-purple-600">AhmedPDF</a>
+                    </div>
+                    <div class="flex items-center space-x-2 sm:space-x-4">
+                        <a href="profile.html" class="text-gray-600 hover:text-purple-600 transition-colors text-sm sm:text-base">Profile</a>
+                        <a href="donations.html" class="text-gray-600 hover:text-purple-600 transition-colors text-sm sm:text-base">Donations</a>
+                        <button id="donateBtn" class="bg-green-500 text-white px-2 sm:px-4 py-2 rounded-lg hover:bg-green-600 transition-colors text-sm">
+                            💝 Donate
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 sm:py-6 space-y-2 sm:space-y-0">
+                    <div>
+                        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">AhmedPDF Analytics</h1>
+                        <p class="text-sm sm:text-base text-gray-600">Real-time usage statistics and insights</p>
+                    </div>
+                    <div class="text-left sm:text-right">
+                        <p class="text-xs sm:text-sm text-gray-500">Last Updated</p>
+                        <p id="lastUpdated" class="text-base sm:text-lg font-semibold text-gray-900">Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+                <div class="stat-card purple rounded-lg p-4 sm:p-6 text-white">
+                    <div class="flex items-center">
+                        <div class="flex-1">
+                            <p class="text-xs sm:text-sm opacity-90">Total Conversions</p>
+                            <p id="totalConversions" class="text-2xl sm:text-3xl font-bold">0</p>
+                        </div>
+                        <div class="text-2xl sm:text-4xl opacity-50">📊</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card green rounded-lg p-4 sm:p-6 text-white">
+                    <div class="flex items-center">
+                        <div class="flex-1">
+                            <p class="text-xs sm:text-sm opacity-90">Pages Created</p>
+                            <p id="totalPages" class="text-2xl sm:text-3xl font-bold">0</p>
+                        </div>
+                        <div class="text-2xl sm:text-4xl opacity-50">📄</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card blue rounded-lg p-4 sm:p-6 text-white">
+                    <div class="flex items-center">
+                        <div class="flex-1">
+                            <p class="text-xs sm:text-sm opacity-90">Files Processed</p>
+                            <p id="totalFiles" class="text-2xl sm:text-3xl font-bold">0</p>
+                        </div>
+                        <div class="text-2xl sm:text-4xl opacity-50">🖼️</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card orange rounded-lg p-4 sm:p-6 text-white">
+                    <div class="flex items-center">
+                        <div class="flex-1">
+                            <p class="text-xs sm:text-sm opacity-90">Text Blocks</p>
+                            <p id="totalTextBlocks" class="text-2xl sm:text-3xl font-bold">0</p>
+                        </div>
+                        <div class="text-2xl sm:text-4xl opacity-50">📝</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Stats -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+                <div class="bg-white rounded-lg shadow p-4 sm:p-6">
+                    <h3 class="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Today's Activity</h3>
+                    <div class="space-y-2 sm:space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-xs sm:text-sm text-gray-600">Conversions:</span>
+                            <span id="todayConversions" class="text-sm sm:text-base font-semibold">0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-xs sm:text-sm text-gray-600">Pages Created:</span>
+                            <span id="todayPages" class="text-sm sm:text-base font-semibold">0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow p-4 sm:p-6">
+                    <h3 class="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Storage</h3>
+                    <div class="space-y-2 sm:space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-xs sm:text-sm text-gray-600">Total Size:</span>
+                            <span id="totalSize" class="text-sm sm:text-base font-semibold">0 MB</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-xs sm:text-sm text-gray-600">Unique Sessions:</span>
+                            <span id="uniqueSessions" class="text-sm sm:text-base font-semibold">0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow p-4 sm:p-6 sm:col-span-2 lg:col-span-1">
+                    <h3 class="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Quick Actions</h3>
+                    <div class="space-y-2">
+                        <button onclick="refreshStats()" class="w-full bg-purple-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm sm:text-base">
+                            Refresh Stats
+                        </button>
+                        <button onclick="exportData()" class="w-full bg-gray-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors text-sm sm:text-base">
+                            Export Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                <div class="bg-white rounded-lg shadow p-4 sm:p-6">
+                    <h3 class="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Daily Conversions (Last 30 Days)</h3>
+                    <div class="relative" style="height: 300px;">
+                        <canvas id="dailyChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow p-4 sm:p-6">
+                    <h3 class="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Platform Distribution</h3>
+                    <div class="relative" style="height: 300px;">
+                        <canvas id="platformChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Donation Modal -->
+    <div id="donationModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4 transition-all duration-300 ease-in-out">
+        <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto transition-all duration-300 ease-in-out">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-gray-900">
+                    <i class="fas fa-heart text-red-500 mr-2"></i>
+                                           <span data-en="Support AhmedPDF" data-ar="ادعم أحمد PDF">Support AhmedPDF</span>
+                </h3>
+                <button id="closeDonationModal" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- Thank You Message -->
+            <div id="thankYouMessage" class="text-center mb-6">
+                <div class="text-green-500 text-4xl mb-3">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <h4 class="text-xl font-semibold text-gray-900 mb-2">
+                    <span data-en="Thank You for Your Support!" data-ar="شكراً لك على دعمك!">Thank You for Your Support!</span>
+                </h4>
+                <p class="text-gray-600">
+                    <span data-en="Choose your preferred payment method below:" data-ar="اختر طريقة الدفع المفضلة أدناه:">Choose your preferred payment method below:</span>
+                </p>
+            </div>
+            
+            <!-- Payment Methods -->
+            <div class="space-y-4 mb-6">
+                <!-- STC Pay SADAD -->
+                <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all duration-300 cursor-pointer transform hover:scale-[1.02]" onclick="showPaymentDetails('sadad')">
+                    <div class="flex items-center">
+                        <div class="text-blue-600 text-3xl mr-4">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-gray-900 mb-1">
+                                <span data-en="STC Pay SADAD" data-ar="STC باي سداد">STC Pay SADAD</span>
+                            </h4>
+                            <p class="text-sm text-gray-600">
+                                <span data-en="Saudi Bank Transfer" data-ar="تحويل بنكي سعودي">Saudi Bank Transfer</span>
+                            </p>
+                        </div>
+                        <div class="text-gray-400">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- PayPal -->
+                <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all duration-300 cursor-pointer transform hover:scale-[1.02]" onclick="showPaymentDetails('paypal')">
+                    <div class="flex items-center">
+                        <div class="text-blue-500 text-3xl mr-4">
+                            <i class="fab fa-paypal"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-gray-900 mb-1">PayPal</h4>
+                            <p class="text-sm text-gray-600">
+                                <span data-en="International Payment" data-ar="دفع دولي">International Payment</span>
+                            </p>
+                        </div>
+                        <div class="text-gray-400">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Crypto -->
+                <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all duration-300 cursor-pointer transform hover:scale-[1.02]" onclick="showPaymentDetails('crypto')">
+                    <div class="flex items-center">
+                        <div class="text-orange-500 text-3xl mr-4">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-gray-900 mb-1">
+                                <span data-en="Cryptocurrency" data-ar="العملات الرقمية">Cryptocurrency</span>
+                            </h4>
+                            <p class="text-sm text-gray-600">
+                                <span data-en="Multiple Crypto Options" data-ar="خيارات متعددة للعملات الرقمية">Multiple Crypto Options</span>
+                            </p>
+                        </div>
+                        <div class="text-gray-400">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Payment Details Sections -->
+            <div id="paymentDetails" class="hidden">
+                <!-- SADAD Details -->
+                <div id="sadadDetails" class="hidden">
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                        <h4 class="font-semibold text-blue-900 mb-3">
+                            <i class="fas fa-mobile-alt mr-2"></i>
+                            <span data-en="STC Pay SADAD Instructions" data-ar="تعليمات STC باي سداد">STC Pay SADAD Instructions</span>
+                        </h4>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex items-start">
+                                <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold mr-3 mt-0.5">1</span>
+                                <span data-en="Go to your bank's PAY SADAD FATOORAH service" data-ar="اذهب إلى خدمة PAY SADAD FATOORAH في بنكك">Go to your bank's PAY SADAD FATOORAH service</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold mr-3 mt-0.5">2</span>
+                                <span data-en="Type 209 to select STC" data-ar="اكتب 209 لاختيار STC">Type 209 to select STC</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold mr-3 mt-0.5">3</span>
+                                <span data-en="Enter the invoice number provided below" data-ar="أدخل رقم الفاتورة المقدم أدناه">Enter the invoice number provided below</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold mr-3 mt-0.5">4</span>
+                                <span data-en="Complete your payment" data-ar="أكمل عملية الدفع">Complete your payment</span>
+                            </div>
+                        </div>
+                        <div class="mt-4 p-3 bg-white border border-blue-300 rounded">
+                            <p class="text-sm text-gray-700 mb-2">
+                                <span data-en="Invoice Number:" data-ar="رقم الفاتورة:">Invoice Number:</span>
+                            </p>
+                            <p class="font-mono text-lg font-bold text-blue-900">INV-2024-001</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- PayPal Details -->
+                <div id="paypalDetails" class="hidden">
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                        <h4 class="font-semibold text-blue-900 mb-3">
+                            <i class="fab fa-paypal mr-2"></i>
+                            <span data-en="PayPal Payment" data-ar="دفع PayPal">PayPal Payment</span>
+                        </h4>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex items-start">
+                                <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold mr-3 mt-0.5">1</span>
+                                <span data-en="Click the PayPal button below" data-ar="انقر على زر PayPal أدناه">Click the PayPal button below</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold mr-3 mt-0.5">2</span>
+                                <span data-en="You'll be redirected to PayPal" data-ar="سيتم توجيهك إلى PayPal">You'll be redirected to PayPal</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold mr-3 mt-0.5">3</span>
+                                <span data-en="Complete your payment securely" data-ar="أكمل عملية الدفع بأمان">Complete your payment securely</span>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <a href="https://www.paypal.com/paypalme/mdymnha" target="_blank" class="inline-flex items-center bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors">
+                                <i class="fab fa-paypal mr-2"></i>
+                                <span data-en="Pay with PayPal" data-ar="ادفع بـ PayPal">Pay with PayPal</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Crypto Details -->
+                <div id="cryptoDetails" class="hidden">
+                    <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-4">
+                        <h4 class="font-semibold text-orange-900 mb-3">
+                            <i class="fas fa-coins mr-2"></i>
+                            <span data-en="Cryptocurrency Payment" data-ar="دفع العملات الرقمية">Cryptocurrency Payment</span>
+                        </h4>
+                        <p class="text-sm text-gray-700 mb-4">
+                            <span data-en="Choose your preferred cryptocurrency and copy the wallet address:" data-ar="اختر العملة الرقمية المفضلة وانسخ عنوان المحفظة:">Choose your preferred cryptocurrency and copy the wallet address:</span>
+                        </p>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <!-- BTC -->
+                            <div class="bg-white border border-gray-200 rounded-lg p-3">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center">
+                                        <i class="fab fa-bitcoin text-orange-500 text-xl mr-2"></i>
+                                        <span class="font-semibold">Bitcoin (BTC)</span>
+                                    </div>
+                                    <button onclick="copyToClipboard('bc1qcp0c9whfl8wzdg3l5qqrekgl7zhgeynff790fl')" class="text-blue-500 hover:text-blue-700">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                                <p class="text-xs font-mono text-gray-600 break-all">bc1qcp0c9whfl8wzdg3l5qqrekgl7zhgeynff790fl</p>
+                            </div>
+                            
+                            <!-- ETH -->
+                            <div class="bg-white border border-gray-200 rounded-lg p-3">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center">
+                                        <i class="fab fa-ethereum text-blue-500 text-xl mr-2"></i>
+                                        <span class="font-semibold">Ethereum (ETH)</span>
+                                    </div>
+                                    <button onclick="copyToClipboard('0xD6528fe3d4b8EF2Df215C8aEB7E7653786a3272E')" class="text-blue-500 hover:text-blue-700">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                                <p class="text-xs font-mono text-gray-600 break-all">0xD6528fe3d4b8EF2Df215C8aEB7E7653786a3272E</p>
+                            </div>
+                            
+                            <!-- SOL -->
+                            <div class="bg-white border border-gray-200 rounded-lg p-3">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-circle text-purple-500 text-xl mr-2"></i>
+                                        <span class="font-semibold">Solana (SOL)</span>
+                                    </div>
+                                    <button onclick="copyToClipboard('6nhSTMLWXSjjE7aVm7936RZp2ac2BoTfyzhMfGKzfaug')" class="text-blue-500 hover:text-blue-700">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                                <p class="text-xs font-mono text-gray-600 break-all">6nhSTMLWXSjjE7aVm7936RZp2ac2BoTfyzhMfGKzfaug</p>
+                            </div>
+                            
+                            <!-- LTC -->
+                            <div class="bg-white border border-gray-200 rounded-lg p-3">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-circle text-gray-500 text-xl mr-2"></i>
+                                        <span class="font-semibold">Litecoin (LTC)</span>
+                                    </div>
+                                    <button onclick="copyToClipboard('La6eVKoyGv3N122wWnjrB6s3WEvM8gyBxA')" class="text-blue-500 hover:text-blue-700">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                                <p class="text-xs font-mono text-gray-600 break-all">La6eVKoyGv3N122wWnjrB6s3WEvM8gyBxA</p>
+                            </div>
+                            
+                            <!-- USDT -->
+                            <div class="bg-white border border-gray-200 rounded-lg p-3">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-circle text-green-500 text-xl mr-2"></i>
+                                        <span class="font-semibold">USDT</span>
+                                    </div>
+                                    <button onclick="copyToClipboard('0xD6528fe3d4b8EF2Df215C8aEB7E7653786a3272E')" class="text-blue-500 hover:text-blue-700">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                                <p class="text-xs font-mono text-gray-600 break-all">0xD6528fe3d4b8EF2Df215C8aEB7E7653786a3272E</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Back Button -->
+            <div id="backButton" class="hidden text-center">
+                <button onclick="showPaymentMethods()" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    <span data-en="Back to Payment Methods" data-ar="العودة إلى طرق الدفع">Back to Payment Methods</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    
+    <script>
+        const SUPABASE_URL = window.ENV.SUPABASE_URL;
+        const SUPABASE_ANON_KEY = window.ENV.API_KEY;
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        let dailyChart = null;
+        let platformChart = null;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            showLoadingState();
+            loadDashboardData();
+            initializeDonationModal();
+        });
+        
+        function showLoadingState() {
+            const elements = [
+                'totalConversions', 'totalPages', 'totalFiles', 'totalTextBlocks',
+                'totalSize', 'uniqueSessions', 'todayConversions', 'todayPages'
+            ];
+            
+            elements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = '...';
+                    element.classList.add('animate-pulse');
+                }
+            });
+            
+            if (document.getElementById('lastUpdated')) {
+                document.getElementById('lastUpdated').textContent = 'Loading...';
+            }
+        }
+        
+        function hideLoadingState() {
+            const elements = [
+                'totalConversions', 'totalPages', 'totalFiles', 'totalTextBlocks',
+                'totalSize', 'uniqueSessions', 'todayConversions', 'todayPages'
+            ];
+            
+            elements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.classList.remove('animate-pulse');
+                }
+            });
+        }
+        
+        async function checkAuth() {
+            const { data: { user } } = await supabase.auth.getUser();
+            
+            if (!user) {
+                window.location.href = 'auth.html';
+                return;
+            }
+            
+            if (user.email !== window.ENV.ADMIN_EMAIL) {
+                showPopup('Access denied. Only administrators can view analytics.', 'error');
+                window.location.href = 'index.html';
+                return;
+            }
+        }
+        
+        async function loadDashboardData() {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                
+                if (!user) {
+                    hideLoadingState();
+                    return;
+                }
+                
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Request timeout')), 10000)
+                );
+                
+                const dataPromise = Promise.all([
+                    supabase
+                        .from('usage_logs')
+                        .select('*')
+                        .order('created_at', { ascending: false })
+                        .limit(100),
+                    supabase
+                        .from('donations')
+                        .select('*')
+                        .eq('status', 'completed')
+                ]);
+                
+                const [usageResult, donationsResult] = await Promise.race([dataPromise, timeoutPromise]);
+                
+                const usageLogs = usageResult.data || [];
+                const donations = donationsResult.data || [];
+                
+                updateStats(usageLogs, donations);
+                createCharts(usageLogs);
+                hideLoadingState();
+                
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                hideLoadingState();
+                
+                if (error.message === 'Request timeout') {
+                    showPopup('Dashboard loading timed out. Please refresh the page.', 'warning');
+                } else {
+                    showPopup('Error loading dashboard data. Showing cached data if available.', 'warning');
+                }
+                
+                updateStats([], []);
+                createCharts([]);
+            }
+        }
+        
+        function updateStats(usageLogs, donations) {
+            const totalConversions = usageLogs.length;
+            const totalPages = usageLogs.reduce((sum, log) => sum + (log.pages || 0), 0);
+            const totalFiles = usageLogs.reduce((sum, log) => sum + (log.file_count || 0), 0);
+            const totalTextBlocks = usageLogs.reduce((sum, log) => sum + (log.text_count || 0), 0);
+            const totalSize = usageLogs.reduce((sum, log) => sum + (log.total_size_mb || 0), 0);
+            const uniqueSessions = new Set(usageLogs.map(log => log.session_id)).size;
+            
+            const today = new Date().toDateString();
+            const todayLogs = usageLogs.filter(log => new Date(log.created_at).toDateString() === today);
+            const todayConversions = todayLogs.length;
+            const todayPages = todayLogs.reduce((sum, log) => sum + (log.pages || 0), 0);
+            
+            if (document.getElementById('totalConversions')) {
+                document.getElementById('totalConversions').textContent = totalConversions;
+            }
+            if (document.getElementById('totalPages')) {
+                document.getElementById('totalPages').textContent = totalPages;
+            }
+            if (document.getElementById('totalFiles')) {
+                document.getElementById('totalFiles').textContent = totalFiles;
+            }
+            if (document.getElementById('totalTextBlocks')) {
+                document.getElementById('totalTextBlocks').textContent = totalTextBlocks;
+            }
+            if (document.getElementById('totalSize')) {
+                document.getElementById('totalSize').textContent = `${totalSize.toFixed(2)} MB`;
+            }
+            if (document.getElementById('uniqueSessions')) {
+                document.getElementById('uniqueSessions').textContent = uniqueSessions;
+            }
+            if (document.getElementById('todayConversions')) {
+                document.getElementById('todayConversions').textContent = todayConversions;
+            }
+            if (document.getElementById('todayPages')) {
+                document.getElementById('todayPages').textContent = todayPages;
+            }
+            if (document.getElementById('lastUpdated')) {
+                document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+            }
+        }
+        
+        function createCharts(usageLogs) {
+            // Destroy existing charts if they exist
+            if (dailyChart) {
+                dailyChart.destroy();
+                dailyChart = null;
+            }
+            if (platformChart) {
+                platformChart.destroy();
+                platformChart = null;
+            }
+            
+            const conversionChart = document.getElementById('dailyChart').getContext('2d');
+            const deviceChart = document.getElementById('platformChart').getContext('2d');
+            
+            const last7Days = getLast7Days();
+            const dailyData = last7Days.map(date => {
+                const dayLogs = usageLogs.filter(log => {
+                    const logDate = new Date(log.created_at).toDateString();
+                    return logDate === date.toDateString();
+                });
+                return {
+                    date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                    count: dayLogs.length
+                };
+            });
+            
+            dailyChart = new Chart(conversionChart, {
+                type: 'line',
+                data: {
+                    labels: dailyData.map(d => d.date),
+                    datasets: [{
+                        label: 'Conversions',
+                        data: dailyData.map(d => d.count),
+                        borderColor: '#8B5CF6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+            
+            const deviceData = {};
+            usageLogs.forEach(log => {
+                const device = log.device_type || 'Unknown';
+                deviceData[device] = (deviceData[device] || 0) + 1;
+            });
+            
+            platformChart = new Chart(deviceChart, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(deviceData),
+                    datasets: [{
+                        data: Object.values(deviceData),
+                        backgroundColor: [
+                            '#8B5CF6',
+                            '#10B981',
+                            '#F59E0B',
+                            '#EF4444'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+        
+        function getLast7Days() {
+            const dates = [];
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                dates.push(date);
+            }
+            return dates;
+        }
+        
+        function initializeDonationModal() {
+            const donateBtn = document.getElementById('donateBtn');
+            const donationModal = document.getElementById('donationModal');
+            const closeDonationModal = document.getElementById('closeDonationModal');
+            
+            if (donateBtn) {
+                donateBtn.addEventListener('click', () => {
+                    showDonationModal();
+                });
+            }
+            
+            if (closeDonationModal) {
+                closeDonationModal.addEventListener('click', () => {
+                    hideDonationModal();
+                });
+            }
+        }
+
+        function showDonationModal() {
+            const modal = document.getElementById('donationModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            modal.style.opacity = '0';
+            modal.style.transform = 'scale(0.95)';
+            
+            setTimeout(() => {
+                modal.style.opacity = '1';
+                modal.style.transform = 'scale(1)';
+            }, 10);
+            
+            showPaymentMethods();
+        }
+
+        function hideDonationModal() {
+            const modal = document.getElementById('donationModal');
+            modal.style.opacity = '0';
+            modal.style.transform = 'scale(0.95)';
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 200);
+            
+            showPaymentMethods();
+        }
+
+        function showPaymentMethods() {
+            document.getElementById('thankYouMessage').classList.remove('hidden');
+            document.getElementById('paymentDetails').classList.add('hidden');
+            document.getElementById('backButton').classList.add('hidden');
+            
+            const paymentMethods = document.querySelector('.space-y-4.mb-6');
+            if (paymentMethods) {
+                paymentMethods.classList.remove('hidden');
+            }
+        }
+
+        function showPaymentDetails(method) {
+            document.getElementById('thankYouMessage').classList.add('hidden');
+            const paymentMethods = document.querySelector('.space-y-4.mb-6');
+            if (paymentMethods) {
+                paymentMethods.classList.add('hidden');
+            }
+            
+            document.getElementById('paymentDetails').classList.remove('hidden');
+            document.getElementById('backButton').classList.remove('hidden');
+            
+            document.getElementById('sadadDetails').classList.add('hidden');
+            document.getElementById('paypalDetails').classList.add('hidden');
+            document.getElementById('cryptoDetails').classList.add('hidden');
+            
+            switch(method) {
+                case 'sadad':
+                    document.getElementById('sadadDetails').classList.remove('hidden');
+                    break;
+                case 'paypal':
+                    document.getElementById('paypalDetails').classList.remove('hidden');
+                    break;
+                case 'crypto':
+                    document.getElementById('cryptoDetails').classList.remove('hidden');
+                    break;
+            }
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showPopup('Wallet address copied to clipboard!', 'success');
+            }).catch(() => {
+                showPopup('Failed to copy to clipboard', 'error');
+            });
+        }
+        
+        async function handleDonation(amount) {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                const userId = user ? user.id : null;
+                
+                const { data, error } = await supabase
+                    .from('donations')
+                    .insert([{
+                        user_id: userId,
+                        amount: amount,
+                        status: 'pending',
+                        message: 'Thank you for your support!'
+                    }]);
+                
+                if (error) throw error;
+                
+                showPopup('Thank you for your donation! Payment processing is handled externally.', 'success');
+                hideDonationModal();
+                
+            } catch (error) {
+                showPopup('Error processing donation: ' + error.message, 'error');
+            }
+        }
+        
+        function refreshStats() {
+            loadDashboardData();
+            showPopup('Statistics refreshed!', 'success');
+        }
+        
+        async function exportData() {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                
+                if (!user) {
+                    showPopup('Please log in to export data', 'warning');
+                    return;
+                }
+                
+                const { data: usageLogs, error } = await supabase
+                    .from('usage_logs')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                const csvContent = convertToCSV(usageLogs || []);
+                downloadCSV(csvContent, 'pdf_converter_analytics.csv');
+                showPopup('Data exported successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error exporting data:', error);
+                showPopup('Error exporting data: ' + error.message, 'error');
+            }
+        }
+        
+        function convertToCSV(data) {
+            const headers = ['Date', 'Session ID', 'Pages', 'Files', 'Text Blocks', 'Size (MB)', 'Browser', 'OS', 'Device'];
+            const rows = data.map(item => [
+                new Date(item.created_at).toLocaleString(),
+                item.session_id,
+                item.pages,
+                item.file_count,
+                item.text_count,
+                item.total_size_mb,
+                item.browser,
+                item.os,
+                item.device_type
+            ]);
+            
+            return [headers, ...rows].map(row => row.join(',')).join('\n');
+        }
+        
+        function downloadCSV(content, filename) {
+            const blob = new Blob([content], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+        
+        function showPopup(message, type = 'info') {
+            const popup = document.createElement('div');
+            popup.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm transform transition-all duration-300 translate-x-full`;
+            
+            const colors = {
+                success: 'bg-green-500 text-white',
+                error: 'bg-red-500 text-white',
+                warning: 'bg-yellow-500 text-white',
+                info: 'bg-blue-500 text-white'
+            };
+            
+            popup.className += ` ${colors[type] || colors.info}`;
+            
+            popup.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <p class="text-sm font-medium">${message}</p>
+                    </div>
+                    <button class="ml-4 text-white hover:text-gray-200 transition-colors" onclick="this.parentElement.parentElement.remove()">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(popup);
+            
+            setTimeout(() => {
+                popup.classList.remove('translate-x-full');
+            }, 100);
+            
+            setTimeout(() => {
+                popup.classList.add('translate-x-full');
+                setTimeout(() => {
+                    if (popup.parentElement) {
+                        popup.remove();
+                    }
+                }, 300);
+            }, 4000);
+        }
+    </script>
+</body>
+</html> 

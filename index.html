@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AhmedPDF - Image & Text to PDF Converter | Built by Ahmed</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <style>
+        @font-face {
+            font-family: 'IBMPlexSansArabic';
+            src: url('fonts/IBMPlexSansArabic-Regular.ttf') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'IBMPlexSansArabic';
+            src: url('fonts/IBMPlexSansArabic-Medium.ttf') format('truetype');
+            font-weight: 500;
+            font-style: normal;
+        }
+        
+        .font-arabic {
+            font-family: 'IBMPlexSansArabic', 'Inter', sans-serif;
+        }
+        
+        .font-arabic-bold {
+            font-family: 'IBMPlexSansArabic', 'Inter', sans-serif;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-white via-purple-50 to-purple-100 min-h-screen font-inter">
+    <!-- Animated Background -->
+    <div class="animated-bg"></div>
+    
+    <!-- Floating Elements -->
+    <div class="floating-elements">
+        <div class="floating-orb orb-1"></div>
+        <div class="floating-orb orb-2"></div>
+        <div class="floating-orb orb-3"></div>
+        <div class="floating-orb orb-4"></div>
+    </div>
+    
+    <!-- Navigation -->
+    <nav class="bg-white/80 backdrop-blur-sm shadow-sm border-b border-purple-100 sticky top-0 z-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <h1 class="text-xl sm:text-2xl font-bold text-purple-600">
+                        <i class="fas fa-file-pdf mr-2"></i>
+                        <span data-en="AhmedPDF" data-ar="أحمد PDF">AhmedPDF</span>
+                    </h1>
+                </div>
+                <div class="flex items-center space-x-2 sm:space-x-4">
+                    <!-- Language Switcher -->
+                    <button id="languageBtn" class="bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200 transition-colors text-sm flex items-center">
+                        <i class="fas fa-globe mr-2"></i>
+                        <span data-en="EN" data-ar="عربي">EN</span>
+                    </button>
+                    <!-- Analytics (only for admin) -->
+                    <a href="dashboard.html" id="analyticsLink" class="text-gray-600 hover:text-purple-600 transition-colors text-sm sm:text-base hidden">
+                        <i class="fas fa-chart-line mr-1"></i>
+                        <span data-en="Analytics" data-ar="التحليلات">Analytics</span>
+                    </a>
+                    <button id="donateBtn" class="bg-green-500 text-white px-2 sm:px-4 py-2 rounded-lg hover:bg-green-600 transition-colors text-sm">
+                        <i class="fas fa-heart mr-1"></i>
+                        <span data-en="Donate" data-ar="تبرع">Donate</span>
+                    </button>
+                    <!-- Sign In Button (shown when not logged in) -->
+                    <a href="auth.html" id="signInBtn" class="bg-purple-600 text-white px-3 sm:px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors font-medium text-sm sm:text-base">
+                        <i class="fas fa-sign-in-alt mr-2"></i>
+                        <span data-en="Sign In" data-ar="تسجيل الدخول">Sign In</span>
+                    </a>
+                    <!-- Profile Button (shown when logged in) -->
+                    <div id="profileBtn" class="hidden relative">
+                        <button id="profileDropdownBtn" class="flex items-center space-x-1 sm:space-x-2 bg-white border border-gray-200 rounded-lg px-2 sm:px-3 py-2 hover:bg-gray-50 transition-colors min-w-0">
+                            <img id="profileAvatar" src="" alt="Profile" class="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-purple-200 flex-shrink-0 bg-white">
+                            <span id="profileName" class="text-gray-700 font-medium truncate max-w-16 sm:max-w-32 text-xs sm:text-sm"></span>
+                            <div id="donorBadge" class="hidden flex-shrink-0">
+                                <span class="bg-yellow-400 text-yellow-900 text-xs px-1 sm:px-2 py-1 rounded-full font-bold">
+                                    <i class="fas fa-crown"></i>
+                                </span>
+                            </div>
+                            <i class="fas fa-chevron-down w-3 h-3 sm:w-4 sm:h-4 text-gray-500 flex-shrink-0"></i>
+                        </button>
+                        <!-- Profile Dropdown -->
+                        <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-64 sm:w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                            <div class="p-3 sm:p-4">
+                                <div class="flex items-start space-x-2 sm:space-x-3 mb-3 sm:mb-4">
+                                    <img id="dropdownAvatar" src="" alt="Profile" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-purple-200 flex-shrink-0 bg-white">
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex items-center space-x-1 sm:space-x-2 mb-1">
+                                            <span id="dropdownName" class="font-semibold text-gray-900 truncate text-sm sm:text-base"></span>
+                                            <div id="dropdownDonorBadge" class="hidden flex-shrink-0">
+                                                <span class="bg-yellow-400 text-yellow-900 text-xs px-1 sm:px-2 py-1 rounded-full font-bold">
+                                                    <i class="fas fa-crown mr-1"></i>
+                                                    <span data-en="Donor" data-ar="متبرع">Donor</span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <span id="dropdownEmail" class="text-xs sm:text-sm text-gray-500 break-all"></span>
+                                    </div>
+                                </div>
+                                <div class="space-y-1 sm:space-y-2">
+                                    <button id="viewProfileBtn" class="w-full text-left px-2 sm:px-3 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                                        <i class="fas fa-user mr-2"></i>
+                                        <span data-en="View Profile" data-ar="عرض الملف الشخصي">View Profile</span>
+                                    </button>
+                                    <button id="myDonationsBtn" class="w-full text-left px-2 sm:px-3 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                                        <i class="fas fa-heart mr-2"></i>
+                                        <span data-en="My Donations" data-ar="تبرعاتي">My Donations</span>
+                                    </button>
+                                    <hr class="my-1 sm:my-2">
+                                    <button id="signOutBtn" class="w-full text-left px-2 sm:px-3 py-2 text-xs sm:text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                                        <i class="fas fa-sign-out-alt mr-2"></i>
+                                        <span data-en="Sign Out" data-ar="تسجيل الخروج">Sign Out</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+    <!-- Main Container -->
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 relative z-10">
+        <!-- Header -->
+        <header class="text-center mb-8 sm:mb-16">
+            <div class="mb-4 sm:mb-6">
+                <h1 class="text-3xl sm:text-5xl md:text-7xl font-light text-gray-800 mb-2 sm:mb-4 tracking-tight">
+                    <i class="fas fa-file-pdf text-purple-600 mr-4"></i>
+                    <span data-en="AhmedPDF" data-ar="أحمد PDF">AhmedPDF</span>
+                </h1>
+                <p class="text-lg sm:text-xl text-purple-600 font-medium">
+                    <i class="fas fa-user mr-2"></i>
+                    <span data-en="from Ahmed" data-ar="من أحمد">from Ahmed</span>
+                </p>
+            </div>
+            <div class="max-w-3xl mx-auto">
+                <p class="text-base sm:text-lg text-gray-600 mb-4 leading-relaxed">
+                    <span data-en="Transform your images and text into beautiful PDFs instantly. " data-ar="حول صورك ونصوصك إلى ملفات PDF جميلة فوراً. ">Transform your images and text into beautiful PDFs instantly. </span>
+                    <span class="text-purple-600 font-semibold">
+                        <span data-en="Drag, drop, reorder, and convert" data-ar="اسحب، أفلت، أعد ترتيب، واحول">Drag, drop, reorder, and convert</span>
+                    </span>
+                    <span data-en=" - all in your browser." data-ar=" - كل ذلك في متصفحك."> - all in your browser.</span>
+                </p>
+                <p class="text-sm sm:text-base text-gray-500">
+                    <i class="fas fa-shield-alt mr-2"></i>
+                    <span data-en="No uploads to servers. No sign-ups required. Your content stays private." data-ar="لا رفع للملفات على الخوادم. لا حاجة للتسجيل. محتواك يبقى خاصاً.">No uploads to servers. No sign-ups required. Your content stays private.</span>
+                </p>
+            </div>
+        </header>
+
+        <!-- Image Upload Section -->
+        <section class="mb-8 sm:mb-12">
+            <div class="upload-area border-2 border-dashed border-gray-300 rounded-xl p-8 sm:p-12 text-center transition-all duration-300 hover:border-purple-400 hover:bg-purple-50/50" id="uploadArea">
+                <div class="max-w-md mx-auto">
+                    <div class="mb-6">
+                        <i class="fas fa-cloud-upload-alt text-6xl sm:text-7xl text-purple-400 mb-4"></i>
+                        <h3 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-2">
+                            <span data-en="Drop images here or click to upload" data-ar="أفلت الصور هنا أو اضغط للرفع">Drop images here or click to upload</span>
+                        </h3>
+                        <p class="text-sm sm:text-base text-gray-600">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            <span data-en="Supports JPG, PNG, GIF, WebP • Max 50 images" data-ar="يدعم JPG, PNG, GIF, WebP • حد أقصى 50 صورة">Supports JPG, PNG, GIF, WebP • Max 50 images</span>
+                        </p>
+                    </div>
+                    <button id="uploadArea" class="bg-purple-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg hover:bg-purple-700 transition-colors font-medium text-sm sm:text-base">
+                        <i class="fas fa-images mr-2"></i>
+                        <span data-en="Choose Images" data-ar="اختر الصور">Choose Images</span>
+                    </button>
+                </div>
+                <input type="file" id="imageInput" multiple accept="image/*" class="hidden">
+            </div>
+        </section>
+
+        <!-- Text Content Section -->
+        <section class="mb-8 sm:mb-12">
+            <div class="flex items-center justify-between mb-4 sm:mb-6">
+                <h2 class="text-xl sm:text-2xl font-semibold text-gray-800">
+                    <i class="fas fa-align-left mr-2"></i>
+                    <span data-en="Add Text Content" data-ar="إضافة محتوى نصي">Add Text Content</span>
+                </h2>
+                <button id="addTextBtn" class="bg-green-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg hover:bg-green-700 transition-colors font-medium text-sm sm:text-base">
+                    <i class="fas fa-plus mr-2"></i>
+                    <span data-en="Add Text" data-ar="إضافة نص">Add Text</span>
+                </button>
+            </div>
+            
+            <div id="textInputContainer" class="hidden">
+                <div class="text-input-block">
+                    <input type="text" id="textTitleInput" class="text-title-input" placeholder="Enter title...">
+                    <textarea id="textContentInput" class="text-content-input" placeholder="Enter your text content here..."></textarea>
+                    <div class="text-actions">
+                        <button id="cancelTextBtn" class="cancel-text-btn">
+                            <i class="fas fa-times mr-1"></i>
+                            <span data-en="Cancel" data-ar="إلغاء">Cancel</span>
+                        </button>
+                        <button id="saveTextBtn" class="save-text-btn">
+                            <i class="fas fa-save mr-1"></i>
+                            <span data-en="Save" data-ar="حفظ">Save</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Content Preview Section -->
+        <section class="mb-8 sm:mb-12">
+            <div class="flex items-center justify-between mb-4 sm:mb-6">
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-semibold text-gray-800">
+                        <i class="fas fa-eye mr-2"></i>
+                        <span data-en="Your Content" data-ar="محتواك">Your Content</span>
+                    </h2>
+                    <p class="text-sm text-gray-600 mt-1">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        <span data-en="Drag to reorder • Click x to remove" data-ar="اسحب لإعادة الترتيب • اضغط x للحذف">Drag to reorder • Click x to remove</span>
+                    </p>
+                </div>
+                <div class="flex space-x-2 sm:space-x-3">
+                    <button id="convertBtn" class="bg-purple-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium text-sm sm:text-base">
+                        <i class="fas fa-file-pdf mr-2"></i>
+                        <span data-en="Convert to PDF" data-ar="تحويل إلى PDF">Convert to PDF</span>
+                    </button>
+                    <button id="clearAllBtn" class="bg-gray-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg hover:bg-gray-700 transition-colors font-medium text-sm sm:text-base">
+                        <i class="fas fa-trash mr-2"></i>
+                        <span data-en="Clear All" data-ar="مسح الكل">Clear All</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="contentContainer" class="content-grid">
+                <!-- Content items will be added here -->
+            </div>
+        </section>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg p-8 text-center">
+                <div class="loading-spinner mx-auto mb-4"></div>
+                <p class="text-lg font-semibold text-gray-800">
+                    <i class="fas fa-cog fa-spin mr-2"></i>
+                    <span data-en="Converting to PDF..." data-ar="جاري التحويل إلى PDF...">Converting to PDF...</span>
+                </p>
+                <p class="text-sm text-gray-600 mt-2">
+                    <span data-en="Please wait while we process your content" data-ar="يرجى الانتظار بينما نعالج محتواك">Please wait while we process your content</span>
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center py-8 sm:py-12 mt-16 sm:mt-20">
+            <p class="text-gray-600 text-sm sm:text-base">
+                <i class="fas fa-heart text-red-500 mr-1"></i>
+                <span data-en="Built by Ahmed with love" data-ar="صنع بواسطة أحمد بحب">Built by Ahmed with love</span>
+            </p>
+        </footer>
+    </div>
+
+           <!-- Donation Modal -->
+       <div id="donationModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4 transition-all duration-300 ease-in-out">
+           <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto transition-all duration-300 ease-in-out">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-gray-900">
+                    <i class="fas fa-heart text-red-500 mr-2"></i>
+                                           <span data-en="Support AhmedPDF" data-ar="ادعم أحمد PDF">Support AhmedPDF</span>
+                </h3>
+                <button id="closeDonationModal" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- Thank You Message -->
+            <div id="thankYouMessage" class="text-center mb-6">
+                <div class="text-green-500 text-4xl mb-3">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <h4 class="text-xl font-semibold text-gray-900 mb-2">
+                    <span data-en="Thank You for Your Support!" data-ar="شكراً لك على دعمك!">Thank You for Your Support!</span>
+                </h4>
+                <p class="text-gray-600">
+                    <span data-en="Choose your preferred payment method below:" data-ar="اختر طريقة الدفع المفضلة أدناه:">Choose your preferred payment method below:</span>
+                </p>
+            </div>
+            
+                           <!-- Payment Methods -->
+               <div class="space-y-4 mb-6">
+                   <!-- STC Pay SADAD -->
+                   <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all duration-300 cursor-pointer transform hover:scale-[1.02]" onclick="showPaymentDetails('sadad')">
+                       <div class="flex items-center">
+                           <div class="text-blue-600 text-3xl mr-4">
+                               <i class="fas fa-mobile-alt"></i>
+                           </div>
+                           <div class="flex-1">
+                               <h4 class="font-semibold text-gray-900 mb-1">
+                                   <span data-en="STC Pay SADAD" data-ar="STC باي سداد">STC Pay SADAD</span>
+                               </h4>
+                               <p class="text-sm text-gray-600">
+                                   <span data-en="Saudi Bank Transfer" data-ar="تحويل بنكي سعودي">Saudi Bank Transfer</span>
+                               </p>
+                           </div>
+                           <div class="text-gray-400">
+                               <i class="fas fa-chevron-right"></i>
+                           </div>
+                       </div>
+                   </div>
+                   
+                   <!-- PayPal -->
+                   <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all duration-300 cursor-pointer transform hover:scale-[1.02]" onclick="showPaymentDetails('paypal')">
+                       <div class="flex items-center">
+                           <div class="text-blue-500 text-3xl mr-4">
+                               <i class="fab fa-paypal"></i>
+                           </div>
+                           <div class="flex-1">
+                               <h4 class="font-semibold text-gray-900 mb-1">PayPal</h4>
+                               <p class="text-sm text-gray-600">
+                                   <span data-en="International Payment" data-ar="دفع دولي">International Payment</span>
+                               </p>
+                           </div>
+                           <div class="text-gray-400">
+                               <i class="fas fa-chevron-right"></i>
+                           </div>
+                       </div>
+                   </div>
+                   
+                   <!-- Crypto -->
+                   <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all duration-300 cursor-pointer transform hover:scale-[1.02]" onclick="showPaymentDetails('crypto')">
+                       <div class="flex items-center">
+                           <div class="text-orange-500 text-3xl mr-4">
+                               <i class="fas fa-coins"></i>
+                           </div>
+                           <div class="flex-1">
+                               <h4 class="font-semibold text-gray-900 mb-1">
+                                   <span data-en="Cryptocurrency" data-ar="العملات الرقمية">Cryptocurrency</span>
+                               </h4>
+                               <p class="text-sm text-gray-600">
+                                   <span data-en="Multiple Crypto Options" data-ar="خيارات متعددة للعملات الرقمية">Multiple Crypto Options</span>
+                               </p>
+                           </div>
+                           <div class="text-gray-400">
+                               <i class="fas fa-chevron-right"></i>
+                           </div>
+                       </div>
+                   </div>
+               </div>
+            
+            <!-- Payment Details Sections -->
+            <div id="paymentDetails" class="hidden">
+                <!-- SADAD Details -->
+                <div id="sadadDetails" class="hidden">
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                        <h4 class="font-semibold text-blue-900 mb-3">
+                            <i class="fas fa-mobile-alt mr-2"></i>
+                            <span data-en="STC Pay SADAD Instructions" data-ar="تعليمات STC باي سداد">STC Pay SADAD Instructions</span>
+                        </h4>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex items-start">
+                                <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold mr-3 mt-0.5">1</span>
+                                <span data-en="Go to your bank's PAY SADAD FATOORAH service" data-ar="اذهب إلى خدمة PAY SADAD FATOORAH في بنكك">Go to your bank's PAY SADAD FATOORAH service</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold mr-3 mt-0.5">2</span>
+                                <span data-en="Type 207 to select STC" data-ar="اكتب 207 لاختيار STC">Type 207 to select STC</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold mr-3 mt-0.5">3</span>
+                                <span data-en="Enter the invoice number provided below" data-ar="أدخل رقم الفاتورة المقدم أدناه">Enter the invoice number provided below</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold mr-3 mt-0.5">4</span>
+                                <span data-en="Complete your payment" data-ar="أكمل عملية الدفع">Complete your payment</span>
+                            </div>
+                        </div>
+                        <div class="mt-4 p-3 bg-white border border-blue-300 rounded">
+                            <p class="text-sm text-gray-700 mb-2">
+                                <span data-en="Invoice Number:" data-ar="رقم الفاتورة:">Invoice Number:</span>
+                            </p>
+                            <p class="font-mono text-lg font-bold text-blue-900">81329854498</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- PayPal Details -->
+                <div id="paypalDetails" class="hidden">
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                        <h4 class="font-semibold text-blue-900 mb-3">
+                            <i class="fab fa-paypal mr-2"></i>
+                            <span data-en="PayPal Payment" data-ar="دفع PayPal">PayPal Payment</span>
+                        </h4>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex items-start">
+                                <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold mr-3 mt-0.5">1</span>
+                                <span data-en="Click the PayPal button below" data-ar="اضغط على زر PayPal أدناه">Click the PayPal button below</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold mr-3 mt-0.5">2</span>
+                                <span data-en="You'll be redirected to PayPal" data-ar="سيتم توجيهك إلى PayPal">You'll be redirected to PayPal</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold mr-3 mt-0.5">3</span>
+                                <span data-en="Complete your payment securely" data-ar="أكمل عملية الدفع بأمان">Complete your payment securely</span>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <a href="https://paypal.me/eyyloop" target="_blank" class="inline-flex items-center bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors">
+                                <i class="fab fa-paypal mr-2"></i>
+                                <span data-en="Pay with PayPal" data-ar="ادفع بـ PayPal">Pay with PayPal</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Crypto Details -->
+                <div id="cryptoDetails" class="hidden">
+                    <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-4">
+                        <h4 class="font-semibold text-orange-900 mb-3">
+                            <i class="fas fa-coins mr-2"></i>
+                            <span data-en="Cryptocurrency Payment" data-ar="دفع العملات الرقمية">Cryptocurrency Payment</span>
+                        </h4>
+                        <p class="text-sm text-gray-700 mb-4">
+                            <span data-en="Choose your preferred cryptocurrency and copy the wallet address:" data-ar="اختر العملة الرقمية المفضلة وانسخ عنوان المحفظة:">Choose your preferred cryptocurrency and copy the wallet address:</span>
+                        </p>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <!-- BTC -->
+                            <div class="bg-white border border-gray-200 rounded-lg p-3">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center">
+                                        <i class="fab fa-bitcoin text-orange-500 text-xl mr-2"></i>
+                                        <span class="font-semibold">Bitcoin (BTC)</span>
+                                    </div>
+                                    <button onclick="copyToClipboard('bc1qcp0c9whfl8wzdg3l5qqrekgl7zhgeynff790fl')" class="text-blue-500 hover:text-blue-700">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                                <p class="text-xs font-mono text-gray-600 break-all">bc1qcp0c9whfl8wzdg3l5qqrekgl7zhgeynff790fl</p>
+                            </div>
+                            
+                            <!-- ETH -->
+                            <div class="bg-white border border-gray-200 rounded-lg p-3">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center">
+                                        <i class="fab fa-ethereum text-blue-500 text-xl mr-2"></i>
+                                        <span class="font-semibold">Ethereum (ETH)</span>
+                                    </div>
+                                    <button onclick="copyToClipboard('0xD6528fe3d4b8EF2Df215C8aEB7E7653786a3272E')" class="text-blue-500 hover:text-blue-700">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                                <p class="text-xs font-mono text-gray-600 break-all">0xD6528fe3d4b8EF2Df215C8aEB7E7653786a3272E</p>
+                            </div>
+                            
+                            <!-- SOL -->
+                            <div class="bg-white border border-gray-200 rounded-lg p-3">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-circle text-purple-500 text-xl mr-2"></i>
+                                        <span class="font-semibold">Solana (SOL)</span>
+                                    </div>
+                                    <button onclick="copyToClipboard('6nhSTMLWXSjjE7aVm7936RZp2ac2BoTfyzhMfGKzfaug')" class="text-blue-500 hover:text-blue-700">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                                <p class="text-xs font-mono text-gray-600 break-all">6nhSTMLWXSjjE7aVm7936RZp2ac2BoTfyzhMfGKzfaug</p>
+                            </div>
+                            
+                            <!-- LTC -->
+                            <div class="bg-white border border-gray-200 rounded-lg p-3">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-circle text-gray-500 text-xl mr-2"></i>
+                                        <span class="font-semibold">Litecoin (LTC)</span>
+                                    </div>
+                                    <button onclick="copyToClipboard('La6eVKoyGv3N122wWnjrB6s3WEvM8gyBxA')" class="text-blue-500 hover:text-blue-700">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                                <p class="text-xs font-mono text-gray-600 break-all">La6eVKoyGv3N122wWnjrB6s3WEvM8gyBxA</p>
+                            </div>
+                            
+                            <!-- USDT -->
+                            <div class="bg-white border border-gray-200 rounded-lg p-3">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-circle text-green-500 text-xl mr-2"></i>
+                                        <span class="font-semibold">USDT</span>
+                                    </div>
+                                    <button onclick="copyToClipboard('0xD6528fe3d4b8EF2Df215C8aEB7E7653786a3272E')" class="text-blue-500 hover:text-blue-700">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                                <p class="text-xs font-mono text-gray-600 break-all">0xD6528fe3d4b8EF2Df215C8aEB7E7653786a3272E</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Back Button -->
+            <div id="backButton" class="hidden text-center">
+                <button onclick="showPaymentMethods()" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    <span data-en="Back to Payment Methods" data-ar="العودة إلى طرق الدفع">Back to Payment Methods</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+            <!-- Scripts -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+        <script src="config.js"></script>
+        <script src="script.js"></script>
+</body>
+</html>

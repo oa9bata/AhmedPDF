@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - AhmedPDF</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    
+    <style>
+        .font-inter { font-family: 'Inter', sans-serif; }
+        .profile-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 150px;
+        }
+        @media (min-width: 640px) {
+            .profile-banner {
+                height: 200px;
+            }
+        }
+        .profile-avatar {
+            margin-top: -50px;
+        }
+        @media (min-width: 640px) {
+            .profile-avatar {
+                margin-top: -60px;
+            }
+        }
+        .settings-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        @media (min-width: 640px) {
+            .settings-btn {
+                top: 20px;
+                right: 20px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-inter min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <a href="index.html" class="text-xl sm:text-2xl font-bold text-purple-600">AhmedPDF</a>
+                </div>
+                <div class="flex items-center space-x-2 sm:space-x-4">
+                    <a href="dashboard.html" class="text-gray-600 hover:text-purple-600 transition-colors text-sm sm:text-base hidden sm:block">Analytics</a>
+                    <button id="donateBtn" class="bg-green-500 text-white px-2 sm:px-4 py-2 rounded-lg hover:bg-green-600 transition-colors text-sm">
+                        💝 Donate
+                    </button>
+                    <a href="index.html" class="text-gray-600 hover:text-purple-600 transition-colors text-sm sm:text-base">Home</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Profile Banner -->
+    <div class="profile-banner relative">
+        <button id="changeBannerBtn" class="settings-btn bg-white/20 backdrop-blur-sm text-white px-2 sm:px-4 py-1 sm:py-2 rounded-lg hover:bg-white/30 transition-colors flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm">
+            <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+            </svg>
+            <span class="hidden sm:inline">Change Banner</span>
+            <span class="sm:hidden">Banner</span>
+        </button>
+    </div>
+
+    <!-- Profile Content -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <!-- Profile Header -->
+            <div class="relative px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+                <div class="flex flex-col sm:flex-row sm:items-end space-y-4 sm:space-y-0 sm:space-x-6">
+                    <div class="profile-avatar relative flex justify-center sm:justify-start">
+                        <div class="relative">
+                            <img id="profileAvatar" src="" alt="Profile" class="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white shadow-lg object-cover object-center bg-white">
+                            <button id="changeAvatarBtn" class="absolute bottom-1 sm:bottom-2 right-1 sm:right-2 bg-purple-600 text-white rounded-full p-1.5 sm:p-2 hover:bg-purple-700 transition-colors">
+                                <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex-1 text-center sm:text-left">
+                        <div class="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 mb-2">
+                            <h1 id="profileName" class="text-2xl sm:text-3xl font-bold text-gray-900"></h1>
+                            <div id="donorBadge" class="hidden">
+                                <span class="bg-yellow-400 text-yellow-900 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-bold">💝 Donor</span>
+                            </div>
+                        </div>
+                        <p id="profileEmail" class="text-sm sm:text-base text-gray-600"></p>
+                        <p id="profileJoinDate" class="text-xs sm:text-sm text-gray-500 mt-1"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Stats -->
+            <div class="border-t border-gray-200 px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+                    <div class="text-center">
+                        <div class="text-xl sm:text-2xl font-bold text-purple-600" id="conversionCount">0</div>
+                        <div class="text-xs sm:text-sm text-gray-600">PDF Conversions</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-xl sm:text-2xl font-bold text-green-600" id="donationCount">0</div>
+                        <div class="text-xs sm:text-sm text-gray-600">Donations Made</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-xl sm:text-2xl font-bold text-blue-600" id="totalDonated">$0</div>
+                        <div class="text-xs sm:text-sm text-gray-600">Total Donated</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Details -->
+            <div class="border-t border-gray-200 px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+                <h3 class="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Profile Information</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Full Name</label>
+                        <p id="detailName" class="text-sm sm:text-base text-gray-900"></p>
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Email</label>
+                        <p id="detailEmail" class="text-sm sm:text-base text-gray-900 break-all"></p>
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Where did you find us?</label>
+                        <p id="detailReferral" class="text-sm sm:text-base text-gray-900"></p>
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Member Since</label>
+                        <p id="detailJoinDate" class="text-sm sm:text-base text-gray-900"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="border-t border-gray-200 px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+                <h3 class="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Recent Activity</h3>
+                <div id="recentActivity" class="space-y-3">
+                    <div class="text-gray-500 text-center py-6 sm:py-8">
+                        <p class="text-sm sm:text-base">No recent activity</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden file inputs -->
+    <input type="file" id="avatarInput" accept="image/*" class="hidden">
+    <input type="file" id="bannerInput" accept="image/*" class="hidden">
+    
+    <!-- Avatar Cropping Modal -->
+    <div id="cropModal" class="fixed inset-0 bg-black bg-opacity-75 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-gray-800 rounded-lg p-4 sm:p-6 max-w-4xl w-full mx-4">
+            <div class="flex justify-between items-center mb-4 sm:mb-6">
+                <h3 class="text-lg sm:text-xl font-semibold text-white">Edit Image</h3>
+                <button id="closeCropModal" class="text-gray-400 hover:text-white transition-colors">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Main cropping area -->
+            <div class="relative mb-4 sm:mb-6">
+                <div class="relative overflow-hidden rounded-lg bg-gray-900 border border-gray-700">
+                    <canvas id="cropCanvas" class="block mx-auto cursor-grab w-full max-w-md sm:max-w-lg"></canvas>
+                </div>
+                <div class="text-center mt-2 text-sm text-gray-400">
+                    <i class="fas fa-mouse-pointer mr-1"></i>
+                    <span data-en="Drag the circle to select your avatar area" data-ar="اسحب الدائرة لاختيار منطقة الصورة الشخصية">Drag the circle to select your avatar area</span>
+                </div>
+            </div>
+            
+            <!-- Controls -->
+            <div class="space-y-3 sm:space-y-4">
+                <!-- Zoom controls -->
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
+                    <div class="flex items-center justify-center sm:justify-start space-x-2 sm:space-x-4">
+                        <button id="zoomOutBtn" class="p-2 text-gray-400 hover:text-white transition-colors">
+                            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"></path>
+                            </svg>
+                        </button>
+                        <div class="w-24 sm:w-32">
+                            <input type="range" id="zoomSlider" min="0.5" max="3" step="0.1" value="1" class="w-full">
+                        </div>
+                        <button id="zoomInBtn" class="p-2 text-gray-400 hover:text-white transition-colors">
+                            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7M13 7H7"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <button id="resetBtn" class="p-2 text-gray-400 hover:text-white transition-colors">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- Action buttons -->
+                <div class="flex flex-col sm:flex-row sm:justify-end space-y-2 sm:space-y-0 sm:space-x-3 pt-3 sm:pt-4 border-t border-gray-700">
+                    <button id="resetCrop" class="px-3 sm:px-4 py-2 text-gray-400 hover:text-white transition-colors text-sm sm:text-base">
+                        Reset
+                    </button>
+                    <button id="cancelCrop" class="px-3 sm:px-4 py-2 text-gray-400 hover:text-white transition-colors text-sm sm:text-base">
+                        Cancel
+                    </button>
+                    <button id="saveCrop" class="px-3 sm:px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm sm:text-base">
+                        Apply
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = window.ENV.SUPABASE_URL;
+        const SUPABASE_ANON_KEY = window.ENV.API_KEY;
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        async function checkAuth() {
+            const { data: { user } } = await supabase.auth.getUser();
+            
+            if (!user) {
+                window.location.href = 'auth.html';
+                return;
+            }
+            
+            loadProfile(user);
+        }
+        
+        async function loadProfile(user) {
+            try {
+                const { data: profile, error } = await supabase
+                    .from('user_profiles')
+                    .select('*')
+                    .eq('id', user.id)
+                    .single();
+                
+                if (!profile && !error) {
+                    const { data: newProfile, error: createError } = await supabase
+                        .from('user_profiles')
+                        .insert({
+                            id: user.id,
+                            email: user.email,
+                            full_name: user.user_metadata?.full_name || user.raw_user_meta_data?.full_name || '',
+                            created_at: new Date().toISOString()
+                        })
+                        .select()
+                        .single();
+                    
+                    if (createError) {
+                        console.error('Error creating profile:', createError);
+                    }
+                }
+                
+                const { data: finalProfile } = await supabase
+                    .from('user_profiles')
+                    .select('*')
+                    .eq('id', user.id)
+                    .single();
+                
+                if (finalProfile && !finalProfile.full_name && (user.user_metadata?.full_name || user.raw_user_meta_data?.full_name)) {
+                    const fullName = user.user_metadata?.full_name || user.raw_user_meta_data?.full_name;
+                    const { error: updateError } = await supabase
+                        .from('user_profiles')
+                        .update({ full_name: fullName })
+                        .eq('id', user.id);
+                    
+                    if (!updateError) {
+                        finalProfile.full_name = fullName;
+                    }
+                }
+                
+                if (finalProfile) {
+                    document.getElementById('profileName').textContent = finalProfile.full_name || user.email;
+                    document.getElementById('profileEmail').textContent = user.email;
+                    document.getElementById('detailName').textContent = finalProfile.full_name || 'Not set';
+                    document.getElementById('detailEmail').textContent = user.email;
+                    document.getElementById('detailReferral').textContent = getReferralText(finalProfile.referral_source, finalProfile.referral_other);
+                    
+                    const joinDate = new Date(finalProfile.created_at).toLocaleDateString();
+                    document.getElementById('profileJoinDate').textContent = `Member since ${joinDate}`;
+                    document.getElementById('detailJoinDate').textContent = joinDate;
+                    
+                    if (finalProfile.avatar_url) {
+                        document.getElementById('profileAvatar').src = finalProfile.avatar_url;
+                    } else {
+                        const initial = finalProfile.full_name ? finalProfile.full_name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase();
+                        const svgPlaceholder = `data:image/svg+xml;base64,${btoa(`
+                            <svg width="128" height="128" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="128" height="128" fill="#8B5CF6"/>
+                                <text x="64" y="80" font-family="Arial, sans-serif" font-size="48" fill="white" text-anchor="middle">${initial}</text>
+                            </svg>
+                        `)}`;
+                        document.getElementById('profileAvatar').src = svgPlaceholder;
+                    }
+                    
+                    if (finalProfile.banner_url) {
+                        document.querySelector('.profile-banner').style.backgroundImage = `url(${finalProfile.banner_url})`;
+                    }
+                    
+                    const { data: donations } = await supabase
+                        .from('donations')
+                        .select('*')
+                        .eq('user_id', user.id)
+                        .eq('status', 'completed');
+                    
+                    if (donations && donations.length > 0) {
+                        document.getElementById('donorBadge').classList.remove('hidden');
+                        const totalDonated = donations.reduce((sum, d) => sum + parseFloat(d.amount), 0);
+                        document.getElementById('totalDonated').textContent = `$${totalDonated.toFixed(2)}`;
+                        document.getElementById('donationCount').textContent = donations.length;
+                    }
+                } else {
+                    document.getElementById('profileName').textContent = user.email;
+                    document.getElementById('profileEmail').textContent = user.email;
+                    document.getElementById('detailName').textContent = 'Not set';
+                    document.getElementById('detailEmail').textContent = user.email;
+                    document.getElementById('detailReferral').textContent = 'Not specified';
+                    
+                    const joinDate = new Date().toLocaleDateString();
+                    document.getElementById('profileJoinDate').textContent = `Member since ${joinDate}`;
+                    document.getElementById('detailJoinDate').textContent = joinDate;
+                    
+                    const initial = user.email.charAt(0).toUpperCase();
+                    const svgPlaceholder = `data:image/svg+xml;base64,${btoa(`
+                        <svg width="128" height="128" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="128" height="128" fill="#8B5CF6"/>
+                            <text x="64" y="80" font-family="Arial, sans-serif" font-size="48" fill="white" text-anchor="middle">${initial}</text>
+                        </svg>
+                    `)}`;
+                    document.getElementById('profileAvatar').src = svgPlaceholder;
+                }
+                
+                const { data: conversions } = await supabase
+                    .from('usage_logs')
+                    .select('*')
+                    .eq('user_id', user.id);
+                
+                if (conversions) {
+                    document.getElementById('conversionCount').textContent = conversions.length;
+                }
+                
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                document.getElementById('profileName').textContent = user.email;
+                document.getElementById('profileEmail').textContent = user.email;
+                document.getElementById('detailName').textContent = 'Not set';
+                document.getElementById('detailEmail').textContent = user.email;
+                document.getElementById('detailReferral').textContent = 'Not specified';
+                
+                const joinDate = new Date().toLocaleDateString();
+                document.getElementById('profileJoinDate').textContent = `Member since ${joinDate}`;
+                document.getElementById('detailJoinDate').textContent = joinDate;
+                
+                const initial = user.email.charAt(0).toUpperCase();
+                const svgPlaceholder = `data:image/svg+xml;base64,${btoa(`
+                    <svg width="128" height="128" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="128" height="128" fill="#8B5CF6"/>
+                        <text x="64" y="80" font-family="Arial, sans-serif" font-size="48" fill="white" text-anchor="middle">${initial}</text>
+                    </svg>
+                `)}`;
+                document.getElementById('profileAvatar').src = svgPlaceholder;
+            }
+        }
+        
+        function getReferralText(source, other) {
+            if (!source) return 'Not specified';
+            
+            const sources = {
+                'tiktok': 'TikTok',
+                'instagram': 'Instagram',
+                'x': 'X (Twitter)',
+                'somewhere_else': other || 'Somewhere else'
+            };
+            
+            return sources[source] || 'Not specified';
+        }
+        
+        document.getElementById('changeAvatarBtn').addEventListener('click', () => {
+            document.getElementById('avatarInput').click();
+        });
+        
+        document.getElementById('changeBannerBtn').addEventListener('click', () => {
+            document.getElementById('bannerInput').click();
+        });
+        
+        document.getElementById('avatarInput').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                await openCropModal(file);
+            }
+        });
+        
+        document.getElementById('bannerInput').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                await uploadBanner(file);
+            }
+        });
+        
+        async function uploadAvatar(file) {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) return;
+                
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${user.id}/avatar-${Date.now()}.${fileExt}`;
+                
+                const { data, error } = await supabase.storage
+                    .from('avatars')
+                    .upload(fileName, file);
+                
+                if (error) throw error;
+                
+                const { data: { publicUrl } } = supabase.storage
+                    .from('avatars')
+                    .getPublicUrl(fileName);
+                
+                const { error: updateError } = await supabase
+                    .from('user_profiles')
+                    .update({ avatar_url: publicUrl })
+                    .eq('id', user.id);
+                
+                if (updateError) throw updateError;
+                
+                document.getElementById('profileAvatar').src = publicUrl;
+                showPopup('Avatar updated successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error uploading avatar:', error);
+                showPopup('Failed to upload avatar. Please try again.', 'error');
+            }
+        }
+        
+        async function uploadBanner(file) {
+            try {
+                const { data: { user } = {} } = await supabase.auth.getUser();
+                if (!user) return;
+                
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${user.id}/banner-${Date.now()}.${fileExt}`;
+                
+                const { data, error } = await supabase.storage
+                    .from('banners')
+                    .upload(fileName, file);
+                
+                if (error) throw error;
+                
+                const { data: { publicUrl } } = supabase.storage
+                    .from('banners')
+                    .getPublicUrl(fileName);
+                
+                const { error: updateError } = await supabase
+                    .from('user_profiles')
+                    .update({ banner_url: publicUrl })
+                    .eq('id', user.id);
+                
+                if (updateError) throw updateError;
+                
+                document.querySelector('.profile-banner').style.backgroundImage = `url(${publicUrl})`;
+                showPopup('Banner updated successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error uploading banner:', error);
+                showPopup('Failed to upload banner. Please try again.', 'error');
+            }
+        }
+        
+        let cropImage = null;
+        let cropCanvas = null;
+        let cropCtx = null;
+        let originalImage = null;
+        let isDragging = false;
+        let startX = 0;
+        let startY = 0;
+        let cropX = 0;
+        let cropY = 0;
+        let scale = 1;
+        let minScale = 0.5;
+        let maxScale = 3;
+        let cropSize = 200;
+        let canvasWidth = 400;
+        let canvasHeight = 400;
+        
+        async function openCropModal(file) {
+            const modal = document.getElementById('cropModal');
+            const canvas = document.getElementById('cropCanvas');
+            
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+            
+            cropCanvas = canvas;
+            cropCtx = canvas.getContext('2d');
+            
+            scale = 1;
+            cropX = 0;
+            cropY = 0;
+            isDragging = false;
+            
+            const img = new Image();
+            img.onload = function() {
+                originalImage = img;
+                
+                const initialScale = Math.min(canvasWidth / img.width, canvasHeight / img.height);
+                scale = Math.max(initialScale, minScale);
+                
+                const scaledWidth = img.width * scale;
+                const scaledHeight = img.height * scale;
+                const imageX = (canvasWidth - scaledWidth) / 2;
+                const imageY = (canvasHeight - scaledHeight) / 2;
+                
+                cropSize = Math.min(scaledWidth, scaledHeight) * 0.8;
+                cropX = imageX + scaledWidth / 2;
+                cropY = imageY + scaledHeight / 2;
+                
+                drawImage();
+                
+                modal.classList.remove('hidden');
+                
+                const zoomSlider = document.getElementById('zoomSlider');
+                if (zoomSlider) {
+                    zoomSlider.value = scale;
+                }
+            };
+            img.src = URL.createObjectURL(file);
+        }
+        
+        function drawImage() {
+            if (!cropCtx || !originalImage) return;
+            
+            cropCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+            
+            const scaledWidth = originalImage.width * scale;
+            const scaledHeight = originalImage.height * scale;
+            const imageX = (canvasWidth - scaledWidth) / 2;
+            const imageY = (canvasHeight - scaledHeight) / 2;
+            
+            cropCtx.drawImage(originalImage, imageX, imageY, scaledWidth, scaledHeight);
+            
+            cropCtx.globalCompositeOperation = 'source-over';
+            cropCtx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+            cropCtx.fillRect(0, 0, canvasWidth, canvasHeight);
+            
+            cropCtx.globalCompositeOperation = 'destination-out';
+            cropCtx.beginPath();
+            cropCtx.arc(cropX, cropY, cropSize / 2, 0, 2 * Math.PI);
+            cropCtx.fill();
+            
+            cropCtx.globalCompositeOperation = 'source-over';
+            
+            cropCtx.strokeStyle = '#ffffff';
+            cropCtx.lineWidth = 4;
+            cropCtx.beginPath();
+            cropCtx.arc(cropX, cropY, cropSize / 2, 0, 2 * Math.PI);
+            cropCtx.stroke();
+            
+            cropCtx.strokeStyle = '#000000';
+            cropCtx.lineWidth = 2;
+            cropCtx.setLineDash([8, 4]);
+            cropCtx.beginPath();
+            cropCtx.arc(cropX, cropY, cropSize / 2, 0, 2 * Math.PI);
+            cropCtx.stroke();
+            cropCtx.setLineDash([]);
+            
+            cropCtx.strokeStyle = '#ffffff';
+            cropCtx.lineWidth = 1;
+            cropCtx.setLineDash([4, 4]);
+            cropCtx.beginPath();
+            cropCtx.arc(cropX, cropY, cropSize / 2, 0, 2 * Math.PI);
+            cropCtx.stroke();
+            cropCtx.setLineDash([]);
+            
+            window.imageBounds = {
+                x: imageX,
+                y: imageY,
+                width: scaledWidth,
+                height: scaledHeight
+            };
+        }
+        
+        function handleCropMouseDown(e) {
+            const rect = cropCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const distance = Math.sqrt((x - cropX) ** 2 + (y - cropY) ** 2);
+            if (distance <= cropSize / 2) {
+                isDragging = true;
+                startX = x - cropX;
+                startY = y - cropY;
+                cropCanvas.style.cursor = 'grabbing';
+            }
+        }
+        
+        function handleCropMouseMove(e) {
+            if (!isDragging) return;
+            
+            const rect = cropCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            cropX = x - startX;
+            cropY = y - startY;
+            
+            const radius = cropSize / 2;
+            if (window.imageBounds) {
+                const bounds = window.imageBounds;
+                const minX = bounds.x + radius;
+                const maxX = bounds.x + bounds.width - radius;
+                const minY = bounds.y + radius;
+                const maxY = bounds.y + bounds.height - radius;
+                
+                cropX = Math.max(minX, Math.min(maxX, cropX));
+                cropY = Math.max(minY, Math.min(maxY, cropY));
+            } else {
+                cropX = Math.max(radius, Math.min(canvasWidth - radius, cropX));
+                cropY = Math.max(radius, Math.min(canvasHeight - radius, cropY));
+            }
+            
+            drawImage();
+        }
+        
+        function handleCropMouseUp() {
+            isDragging = false;
+            cropCanvas.style.cursor = 'grab';
+        }
+        
+        function getCroppedImage() {
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = cropSize;
+            tempCanvas.height = cropSize;
+            const tempCtx = tempCanvas.getContext('2d');
+            
+            tempCtx.beginPath();
+            tempCtx.arc(cropSize / 2, cropSize / 2, cropSize / 2, 0, 2 * Math.PI);
+            tempCtx.clip();
+            
+            const sourceX = cropX - cropSize / 2;
+            const sourceY = cropY - cropSize / 2;
+            
+            tempCtx.drawImage(cropCanvas, sourceX, sourceY, cropSize, cropSize, 0, 0, cropSize, cropSize);
+            
+            return tempCanvas.toBlob((blob) => {
+                const file = new File([blob], 'avatar.png', { type: 'image/png' });
+                uploadAvatar(file);
+            }, 'image/png');
+        }
+        
+        function handleZoom(newScale) {
+            scale = Math.max(minScale, Math.min(maxScale, newScale));
+            drawImage();
+            
+            const zoomSlider = document.getElementById('zoomSlider');
+            if (zoomSlider) {
+                zoomSlider.value = scale;
+            }
+        }
+        
+        function resetCrop() {
+            if (!originalImage) return;
+            
+            const initialScale = Math.min(canvasWidth / originalImage.width, canvasHeight / originalImage.height);
+            scale = Math.max(initialScale, minScale);
+            
+            const scaledWidth = originalImage.width * scale;
+            const scaledHeight = originalImage.height * scale;
+            const imageX = (canvasWidth - scaledWidth) / 2;
+            const imageY = (canvasHeight - scaledHeight) / 2;
+            
+            cropSize = Math.min(scaledWidth, scaledHeight) * 0.8;
+            cropX = imageX + scaledWidth / 2;
+            cropY = imageY + scaledHeight / 2;
+            
+            drawImage();
+            
+            const zoomSlider = document.getElementById('zoomSlider');
+            if (zoomSlider) {
+                zoomSlider.value = scale;
+            }
+        }
+        
+        document.getElementById('closeCropModal').addEventListener('click', () => {
+            document.getElementById('cropModal').classList.add('hidden');
+        });
+        
+        document.getElementById('cancelCrop').addEventListener('click', () => {
+            document.getElementById('cropModal').classList.add('hidden');
+        });
+        
+        document.getElementById('saveCrop').addEventListener('click', () => {
+            getCroppedImage();
+            document.getElementById('cropModal').classList.add('hidden');
+        });
+        
+        document.getElementById('resetCrop').addEventListener('click', resetCrop);
+        
+        document.getElementById('zoomInBtn').addEventListener('click', () => {
+            handleZoom(scale + 0.1);
+        });
+        
+        document.getElementById('zoomOutBtn').addEventListener('click', () => {
+            handleZoom(scale - 0.1);
+        });
+        
+        document.getElementById('resetBtn').addEventListener('click', resetCrop);
+        
+        document.getElementById('zoomSlider').addEventListener('input', (e) => {
+            handleZoom(parseFloat(e.target.value));
+        });
+        
+        document.getElementById('cropCanvas').addEventListener('mousedown', handleCropMouseDown);
+        document.getElementById('cropCanvas').addEventListener('mousemove', handleCropMouseMove);
+        document.getElementById('cropCanvas').addEventListener('mouseup', handleCropMouseUp);
+        document.getElementById('cropCanvas').addEventListener('mouseleave', handleCropMouseUp);
+        
+        document.getElementById('cropCanvas').style.cursor = 'grab';
+        
+        function showPopup(message, type = 'info') {
+            const popup = document.createElement('div');
+            popup.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm transform transition-all duration-300 translate-x-full`;
+            
+            const colors = {
+                success: 'bg-green-500 text-white',
+                error: 'bg-red-500 text-white',
+                warning: 'bg-yellow-500 text-white',
+                info: 'bg-blue-500 text-white'
+            };
+            
+            popup.className += ` ${colors[type] || colors.info}`;
+            
+            popup.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <p class="text-sm font-medium">${message}</p>
+                    </div>
+                    <button class="ml-4 text-white hover:text-gray-200 transition-colors" onclick="this.parentElement.parentElement.remove()">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(popup);
+            
+            setTimeout(() => {
+                popup.classList.remove('translate-x-full');
+            }, 100);
+            
+            setTimeout(() => {
+                popup.classList.add('translate-x-full');
+                setTimeout(() => {
+                    if (popup.parentElement) {
+                        popup.remove();
+                    }
+                }, 300);
+            }, 4000);
+        }
+        
+        checkAuth();
+    </script>
+</body>
+</html> 

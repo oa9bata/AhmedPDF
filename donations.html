@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Donations - AhmedPDF</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    
+    <style>
+        .font-inter { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 font-inter min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <a href="index.html" class="text-xl sm:text-2xl font-bold text-purple-600">AhmedPDF</a>
+                </div>
+                <div class="flex items-center space-x-2 sm:space-x-4">
+                    <a href="dashboard.html" class="text-gray-600 hover:text-purple-600 transition-colors text-sm sm:text-base hidden sm:block">Analytics</a>
+                    <button id="donateBtn" class="bg-green-500 text-white px-2 sm:px-4 py-2 rounded-lg hover:bg-green-600 transition-colors text-sm">
+                        💝 Donate
+                    </button>
+                    <a href="profile.html" class="text-gray-600 hover:text-purple-600 transition-colors text-sm sm:text-base">Profile</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <!-- Header -->
+            <div class="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 border-b border-gray-200">
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">My Donations</h1>
+                <p class="text-sm sm:text-base text-gray-600 mt-2">Thank you for your generous support!</p>
+            </div>
+
+            <!-- Donations Table -->
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 sm:px-6 lg:px-8 py-3 sm:py-4 text-left text-xs sm:text-sm font-medium text-gray-700">Amount</th>
+                            <th class="px-4 sm:px-6 lg:px-8 py-3 sm:py-4 text-left text-xs sm:text-sm font-medium text-gray-700">Date</th>
+                            <th class="px-4 sm:px-6 lg:px-8 py-3 sm:py-4 text-left text-xs sm:text-sm font-medium text-gray-700">Thanks Message</th>
+                        </tr>
+                    </thead>
+                    <tbody id="donationsTable" class="divide-y divide-gray-200">
+                        <!-- Donations will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="hidden px-4 sm:px-6 lg:px-8 py-8 sm:py-12 text-center">
+                <div class="text-gray-400 mb-3 sm:mb-4">
+                    <svg class="w-12 h-12 sm:w-16 sm:h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-base sm:text-lg font-medium text-gray-900 mb-1 sm:mb-2">No donations yet</h3>
+                <p class="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">Make your first donation to support the project!</p>
+                <button id="donateNowBtn" class="bg-green-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg hover:bg-green-600 transition-colors text-sm sm:text-base">
+                    💝 Donate Now
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Donation Modal -->
+    <div id="donationModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4 transition-all duration-300 ease-in-out">
+        <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto transition-all duration-300 ease-in-out">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-gray-900">
+                    <i class="fas fa-heart text-red-500 mr-2"></i>
+                                           <span data-en="Support AhmedPDF" data-ar="ادعم أحمد PDF">Support AhmedPDF</span>
+                </h3>
+                <button id="closeDonationModal" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- Thank You Message -->
+            <div id="thankYouMessage" class="text-center mb-6">
+                <div class="text-green-500 text-4xl mb-3">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <h4 class="text-xl font-semibold text-gray-900 mb-2">
+                    <span data-en="Thank You for Your Support!" data-ar="شكراً لك على دعمك!">Thank You for Your Support!</span>
+                </h4>
+                <p class="text-gray-600">
+                    <span data-en="Choose your preferred payment method below:" data-ar="اختر طريقة الدفع المفضلة أدناه:">Choose your preferred payment method below:</span>
+                </p>
+            </div>
+            
+            <!-- Payment Methods -->
+            <div class="space-y-4 mb-6">
+                <!-- STC Pay SADAD -->
+                <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all duration-300 cursor-pointer transform hover:scale-[1.02]" onclick="showPaymentDetails('sadad')">
+                    <div class="flex items-center">
+                        <div class="text-blue-600 text-3xl mr-4">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-gray-900 mb-1">
+                                <span data-en="STC Pay SADAD" data-ar="STC باي سداد">STC Pay SADAD</span>
+                            </h4>
+                            <p class="text-sm text-gray-600">
+                                <span data-en="Saudi Bank Transfer" data-ar="تحويل بنكي سعودي">Saudi Bank Transfer</span>
+                            </p>
+                        </div>
+                        <div class="text-gray-400">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- PayPal -->
+                <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all duration-300 cursor-pointer transform hover:scale-[1.02]" onclick="showPaymentDetails('paypal')">
+                    <div class="flex items-center">
+                        <div class="text-blue-500 text-3xl mr-4">
+                            <i class="fab fa-paypal"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-gray-900 mb-1">PayPal</h4>
+                            <p class="text-sm text-gray-600">
+                                <span data-en="International Payment" data-ar="دفع دولي">International Payment</span>
+                            </p>
+                        </div>
+                        <div class="text-gray-400">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Crypto -->
+                <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all duration-300 cursor-pointer transform hover:scale-[1.02]" onclick="showPaymentDetails('crypto')">
+                    <div class="flex items-center">
+                        <div class="text-orange-500 text-3xl mr-4">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-gray-900 mb-1">
+                                <span data-en="Cryptocurrency" data-ar="العملات الرقمية">Cryptocurrency</span>
+                            </h4>
+                            <p class="text-sm text-gray-600">
+                                <span data-en="Multiple Crypto Options" data-ar="خيارات متعددة للعملات الرقمية">Multiple Crypto Options</span>
+                            </p>
+                        </div>
+                        <div class="text-gray-400">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Payment Details Sections -->
+            <div id="paymentDetails" class="hidden">
+                <!-- SADAD Details -->
+                <div id="sadadDetails" class="hidden">
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                        <h4 class="font-semibold text-blue-900 mb-3">
+                            <i class="fas fa-mobile-alt mr-2"></i>
+                            <span data-en="STC Pay SADAD Instructions" data-ar="تعليمات STC باي سداد">STC Pay SADAD Instructions</span>
+                        </h4>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex items-start">
+                                <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold mr-3 mt-0.5">1</span>
+                                <span data-en="Go to your bank's PAY SADAD FATOORAH service" data-ar="اذهب إلى خدمة PAY SADAD FATOORAH في بنكك">Go to your bank's PAY SADAD FATOORAH service</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold mr-3 mt-0.5">2</span>
+                                <span data-en="Type 209 to select STC" data-ar="اكتب 209 لاختيار STC">Type 209 to select STC</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold mr-3 mt-0.5">3</span>
+                                <span data-en="Enter the invoice number provided below" data-ar="أدخل رقم الفاتورة المقدم أدناه">Enter the invoice number provided below</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold mr-3 mt-0.5">4</span>
+                                <span data-en="Complete your payment" data-ar="أكمل عملية الدفع">Complete your payment</span>
+                            </div>
+                        </div>
+                        <div class="mt-4 p-3 bg-white border border-blue-300 rounded">
+                            <p class="text-sm text-gray-700 mb-2">
+                                <span data-en="Invoice Number:" data-ar="رقم الفاتورة:">Invoice Number:</span>
+                            </p>
+                            <p class="font-mono text-lg font-bold text-blue-900">INV-2024-001</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- PayPal Details -->
+                <div id="paypalDetails" class="hidden">
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                        <h4 class="font-semibold text-blue-900 mb-3">
+                            <i class="fab fa-paypal mr-2"></i>
+                            <span data-en="PayPal Payment" data-ar="دفع PayPal">PayPal Payment</span>
+                        </h4>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex items-start">
+                                <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold mr-3 mt-0.5">1</span>
+                                <span data-en="Click the PayPal button below" data-ar="انقر على زر PayPal أدناه">Click the PayPal button below</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold mr-3 mt-0.5">2</span>
+                                <span data-en="You'll be redirected to PayPal" data-ar="سيتم توجيهك إلى PayPal">You'll be redirected to PayPal</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold mr-3 mt-0.5">3</span>
+                                <span data-en="Complete your payment securely" data-ar="أكمل عملية الدفع بأمان">Complete your payment securely</span>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <a href="https://www.paypal.com/paypalme/mdymnha" target="_blank" class="inline-flex items-center bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors">
+                                <i class="fab fa-paypal mr-2"></i>
+                                <span data-en="Pay with PayPal" data-ar="ادفع بـ PayPal">Pay with PayPal</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Crypto Details -->
+                <div id="cryptoDetails" class="hidden">
+                    <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-4">
+                        <h4 class="font-semibold text-orange-900 mb-3">
+                            <i class="fas fa-coins mr-2"></i>
+                            <span data-en="Cryptocurrency Payment" data-ar="دفع العملات الرقمية">Cryptocurrency Payment</span>
+                        </h4>
+                        <p class="text-sm text-gray-700 mb-4">
+                            <span data-en="Choose your preferred cryptocurrency and copy the wallet address:" data-ar="اختر العملة الرقمية المفضلة وانسخ عنوان المحفظة:">Choose your preferred cryptocurrency and copy the wallet address:</span>
+                        </p>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <!-- BTC -->
+                            <div class="bg-white border border-gray-200 rounded-lg p-3">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center">
+                                        <i class="fab fa-bitcoin text-orange-500 text-xl mr-2"></i>
+                                        <span class="font-semibold">Bitcoin (BTC)</span>
+                                    </div>
+                                    <button onclick="copyToClipboard('bc1qcp0c9whfl8wzdg3l5qqrekgl7zhgeynff790fl')" class="text-blue-500 hover:text-blue-700">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                                <p class="text-xs font-mono text-gray-600 break-all">bc1qcp0c9whfl8wzdg3l5qqrekgl7zhgeynff790fl</p>
+                            </div>
+                            
+                            <!-- ETH -->
+                            <div class="bg-white border border-gray-200 rounded-lg p-3">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center">
+                                        <i class="fab fa-ethereum text-blue-500 text-xl mr-2"></i>
+                                        <span class="font-semibold">Ethereum (ETH)</span>
+                                    </div>
+                                    <button onclick="copyToClipboard('0xD6528fe3d4b8EF2Df215C8aEB7E7653786a3272E')" class="text-blue-500 hover:text-blue-700">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                                <p class="text-xs font-mono text-gray-600 break-all">0xD6528fe3d4b8EF2Df215C8aEB7E7653786a3272E</p>
+                            </div>
+                            
+                            <!-- SOL -->
+                            <div class="bg-white border border-gray-200 rounded-lg p-3">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-circle text-purple-500 text-xl mr-2"></i>
+                                        <span class="font-semibold">Solana (SOL)</span>
+                                    </div>
+                                    <button onclick="copyToClipboard('6nhSTMLWXSjjE7aVm7936RZp2ac2BoTfyzhMfGKzfaug')" class="text-blue-500 hover:text-blue-700">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                                <p class="text-xs font-mono text-gray-600 break-all">6nhSTMLWXSjjE7aVm7936RZp2ac2BoTfyzhMfGKzfaug</p>
+                            </div>
+                            
+                            <!-- LTC -->
+                            <div class="bg-white border border-gray-200 rounded-lg p-3">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-circle text-gray-500 text-xl mr-2"></i>
+                                        <span class="font-semibold">Litecoin (LTC)</span>
+                                    </div>
+                                    <button onclick="copyToClipboard('La6eVKoyGv3N122wWnjrB6s3WEvM8gyBxA')" class="text-blue-500 hover:text-blue-700">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                                <p class="text-xs font-mono text-gray-600 break-all">La6eVKoyGv3N122wWnjrB6s3WEvM8gyBxA</p>
+                            </div>
+                            
+                            <!-- USDT -->
+                            <div class="bg-white border border-gray-200 rounded-lg p-3">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-circle text-green-500 text-xl mr-2"></i>
+                                        <span class="font-semibold">USDT</span>
+                                    </div>
+                                    <button onclick="copyToClipboard('0xD6528fe3d4b8EF2Df215C8aEB7E7653786a3272E')" class="text-blue-500 hover:text-blue-700">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                                <p class="text-xs font-mono text-gray-600 break-all">0xD6528fe3d4b8EF2Df215C8aEB7E7653786a3272E</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Back Button -->
+            <div id="backButton" class="hidden text-center">
+                <button onclick="showPaymentMethods()" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    <span data-en="Back to Payment Methods" data-ar="العودة إلى طرق الدفع">Back to Payment Methods</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = window.ENV.SUPABASE_URL;
+        const SUPABASE_ANON_KEY = window.ENV.API_KEY;
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDonations();
+            initializeDonationModal();
+        });
+        
+        async function loadDonations() {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                
+                if (!user) {
+                    window.location.href = 'auth.html';
+                    return;
+                }
+                
+                const { data: donations, error } = await supabase
+                    .from('donations')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                const donationsTable = document.getElementById('donationsTable');
+                const emptyState = document.getElementById('emptyState');
+                
+                if (donations && donations.length > 0) {
+                    donationsTable.classList.remove('hidden');
+                    emptyState.classList.add('hidden');
+                    
+                    const tbody = donationsTable.querySelector('tbody');
+                    tbody.innerHTML = '';
+                    
+                    donations.forEach(donation => {
+                        const row = document.createElement('tr');
+                        row.className = 'border-b border-gray-200 hover:bg-gray-50 transition-colors';
+                        
+                        const date = new Date(donation.created_at).toLocaleDateString();
+                        const status = donation.status === 'completed' ? 'Completed' : 'Pending';
+                        const statusClass = donation.status === 'completed' ? 'text-green-600' : 'text-yellow-600';
+                        
+                        row.innerHTML = `
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">$${parseFloat(donation.amount).toFixed(2)}</td>
+                            <td class="px-4 py-3 text-sm text-gray-500">${date}</td>
+                            <td class="px-4 py-3 text-sm text-gray-500">${donation.message || 'Thank you for your support!'}</td>
+                            <td class="px-4 py-3 text-sm ${statusClass}">${status}</td>
+                        `;
+                        
+                        tbody.appendChild(row);
+                    });
+                } else {
+                    donationsTable.classList.add('hidden');
+                    emptyState.classList.remove('hidden');
+                }
+                
+            } catch (error) {
+                console.error('Error loading donations:', error);
+                showPopup('Error loading donations: ' + error.message, 'error');
+            }
+        }
+        
+        function initializeDonationModal() {
+            const donateBtn = document.getElementById('donateBtn');
+            const donateNowBtn = document.getElementById('donateNowBtn');
+            const donationModal = document.getElementById('donationModal');
+            const closeDonationModal = document.getElementById('closeDonationModal');
+            
+            if (donateBtn) {
+                donateBtn.addEventListener('click', () => {
+                    showDonationModal();
+                });
+            }
+            
+            if (donateNowBtn) {
+                donateNowBtn.addEventListener('click', () => {
+                    showDonationModal();
+                });
+            }
+            
+            if (closeDonationModal) {
+                closeDonationModal.addEventListener('click', () => {
+                    hideDonationModal();
+                });
+            }
+        }
+
+        function showDonationModal() {
+            const modal = document.getElementById('donationModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            modal.style.opacity = '0';
+            modal.style.transform = 'scale(0.95)';
+            
+            setTimeout(() => {
+                modal.style.opacity = '1';
+                modal.style.transform = 'scale(1)';
+            }, 10);
+            
+            showPaymentMethods();
+        }
+
+        function hideDonationModal() {
+            const modal = document.getElementById('donationModal');
+            modal.style.opacity = '0';
+            modal.style.transform = 'scale(0.95)';
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 200);
+            
+            showPaymentMethods();
+        }
+
+        function showPaymentMethods() {
+            document.getElementById('thankYouMessage').classList.remove('hidden');
+            document.getElementById('paymentDetails').classList.add('hidden');
+            document.getElementById('backButton').classList.add('hidden');
+            
+            const paymentMethods = document.querySelector('.space-y-4.mb-6');
+            if (paymentMethods) {
+                paymentMethods.classList.remove('hidden');
+            }
+        }
+
+        function showPaymentDetails(method) {
+            document.getElementById('thankYouMessage').classList.add('hidden');
+            const paymentMethods = document.querySelector('.space-y-4.mb-6');
+            if (paymentMethods) {
+                paymentMethods.classList.add('hidden');
+            }
+            
+            document.getElementById('paymentDetails').classList.remove('hidden');
+            document.getElementById('backButton').classList.remove('hidden');
+            
+            document.getElementById('sadadDetails').classList.add('hidden');
+            document.getElementById('paypalDetails').classList.add('hidden');
+            document.getElementById('cryptoDetails').classList.add('hidden');
+            
+            switch(method) {
+                case 'sadad':
+                    document.getElementById('sadadDetails').classList.remove('hidden');
+                    break;
+                case 'paypal':
+                    document.getElementById('paypalDetails').classList.remove('hidden');
+                    break;
+                case 'crypto':
+                    document.getElementById('cryptoDetails').classList.remove('hidden');
+                    break;
+            }
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showPopup('Wallet address copied to clipboard!', 'success');
+            }).catch(() => {
+                showPopup('Failed to copy to clipboard', 'error');
+            });
+        }
+        
+        async function handleDonation(amount) {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                const userId = user ? user.id : null;
+                
+                const { data, error } = await supabase
+                    .from('donations')
+                    .insert([{
+                        user_id: userId,
+                        amount: amount,
+                        status: 'pending',
+                        message: 'Thank you for your support!'
+                    }]);
+                
+                if (error) throw error;
+                
+                showPopup('Thank you for your donation! We\'ll set up payment processing soon.', 'success');
+                document.getElementById('donationModal').classList.add('hidden');
+                
+                setTimeout(() => {
+                    loadDonations();
+                }, 1000);
+                
+            } catch (error) {
+                showPopup('Error processing donation: ' + error.message, 'error');
+            }
+        }
+        
+        function showPopup(message, type = 'info') {
+            const popup = document.createElement('div');
+            popup.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm transform transition-all duration-300 translate-x-full`;
+            
+            const colors = {
+                success: 'bg-green-500 text-white',
+                error: 'bg-red-500 text-white',
+                warning: 'bg-yellow-500 text-white',
+                info: 'bg-blue-500 text-white'
+            };
+            
+            popup.className += ` ${colors[type] || colors.info}`;
+            
+            popup.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <p class="text-sm font-medium">${message}</p>
+                    </div>
+                    <button class="ml-4 text-white hover:text-gray-200 transition-colors" onclick="this.parentElement.parentElement.remove()">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(popup);
+            
+            setTimeout(() => {
+                popup.classList.remove('translate-x-full');
+            }, 100);
+            
+            setTimeout(() => {
+                popup.classList.add('translate-x-full');
+                setTimeout(() => {
+                    if (popup.parentElement) {
+                        popup.remove();
+                    }
+                }, 300);
+            }, 4000);
+        }
+    </script>
+</body>
+</html> 

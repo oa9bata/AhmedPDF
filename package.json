@@ -1,0 +1,38 @@
+{
+  "name": "ahmedpdf",
+  "version": "1.0.0",
+  "description": "A modern web application for converting images and text to PDF documents with Arabic language support",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "dev": "python -m http.server 8000",
+    "serve": "python -m http.server 8000"
+  },
+  "keywords": [
+    "pdf",
+    "converter",
+    "images",
+    "text",
+    "arabic",
+    "supabase",
+    "javascript",
+    "tailwindcss"
+  ],
+  "author": "Ahmed",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/ahmedpdf.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/ahmedpdf/issues"
+  },
+  "homepage": "https://github.com/yourusername/ahmedpdf#readme",
+  "dependencies": {
+    "dotenv": "^17.2.1"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
