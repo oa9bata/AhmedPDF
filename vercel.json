@@ -3,5 +3,11 @@
     "api/config.js": {
       "maxDuration": 10
     }
-  }
+  },
+  "routes": [
+    {
+      "src": "/api/config.js",
+      "dest": "/api/config.js"
+    }
+  ]
 } 
