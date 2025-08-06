@@ -1,4 +1,0 @@
-window.ENV = {
-  SUPABASE_URL: '%%SUPABASE_URL%%',
-  API_KEY: '%%SUPABASE_ANON_KEY%%'
-}; 
